@@ -7,7 +7,6 @@ AppDynamics Event Mover.
 Periodo a ser consultado
 
 Ex.
-
 Ultimos 5min
 
 ``data=`date -v-5M +%s000` ``
