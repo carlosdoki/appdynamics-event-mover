@@ -2,6 +2,11 @@
 
 AppDynamics Event Mover.
 
+Instalar o JQ no shell.
+
+https://stedolan.github.io/jq/
+
+
 ## Parameters
 
 Periodo a ser consultado
