@@ -43,11 +43,14 @@ then
         fi 
     insert=$insert${campos[$i]}":"${tipos[$i]}
     done
+    
+    insert=$insert"} }"
+
     if [ ${DEBUG} == 1 ]
     then 
         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - insert=$insert" >> $log
     fi
-    insert=$insert"} }"
+    
     echo $insert > data.json
 
     HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "@data.json" | jq '.statusCode')
@@ -148,7 +151,8 @@ then
                         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - dado=$dado" >> $log
                     fi
                     
-                    retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d $dado`
+                    echo $dado > dado.json
+                    retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d "@dado.json" `
                     case $retorno in
                         200)
                             ;;
