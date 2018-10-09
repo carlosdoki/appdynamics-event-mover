@@ -11,7 +11,7 @@ then
     echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - query=$query" >> $log
 fi  
 
-retorno=$(curl -s -o saida.json -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:b2f6e4e9-8fe6-4329-89ae-6878fa0a8227" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/query" -d "$query" )
+retorno=$(curl -s -o saida.json -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/query" -d "$query" )
 
 case $retorno in
     200)
@@ -29,16 +29,17 @@ if [ ! -z "${total_registros}" ];
 then
     echo "`date +%d-%m-%y_%H:%M:%S` - INFO - total_registros=$total_registros" >> $log
     
-    read -r -a campos <<< `cat saida.json | jq -c '.[0].fields[] | select ( .label == "segments") | .fields[] | select ( .field == "userData" ) | .fields[].field'`
+    read -r -a campos <<< `cat saida.json | jq -c '.[0].fields[] | select ( .label == "segments") | .fields[] | select ( .field == "userData" ) | .fields[].field' `
 
-    read -r -a tipos <<< `cat saida.json | jq -c '.[0].fields[] | select ( .label == "segments") | .fields[] | select ( .field == "userData" ) | .fields[].type'`
+    read -r -a tipos <<< `cat saida.json | jq -c '.[0].fields[] | select ( .label == "segments") | .fields[] | select ( .field == "userData" ) | .fields[].type' `
 
-    insert=""
+    insert="{\"schema\" : { "
+    #insert=""
     for ((i=0;i<${#campos[@]};i++))
     do
         if [ ${i} -ne 0 ] 
         then 
-            insert=$insert"," 
+            insert=$insert", " 
         fi 
     insert=$insert${campos[$i]}":"${tipos[$i]}
     done
@@ -46,8 +47,12 @@ then
     then 
         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - insert=$insert" >> $log
     fi
+    insert=$insert"} }"
+    echo $insert > data.json
 
-    HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:b2f6e4e9-8fe6-4329-89ae-6878fa0a8227" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d '{"schema" : {$insert} }' | jq '.statusCode')
+    HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "@data.json" | jq '.statusCode')
+    # HTTP_CODE=`curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "{ \"schema\" : { $insert } } " | jq '.statusCode'`
+    echo $HTTP_CODE
 
     if [ ${DEBUG} == 1 ]
     then 
@@ -143,7 +148,7 @@ then
                         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - dado=$dado" >> $log
                     fi
                     
-                    retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:b2f6e4e9-8fe6-4329-89ae-6878fa0a8227" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d $dado`
+                    retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d $dado`
                     case $retorno in
                         200)
                             ;;
