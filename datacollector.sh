@@ -46,7 +46,7 @@ then
     then 
         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - insert=$insert" >> $log
     fi
-    echo $insert
+
     HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:b2f6e4e9-8fe6-4329-89ae-6878fa0a8227" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d '{"schema" : {$insert} }' | jq '.statusCode')
 
     if [ ${DEBUG} == 1 ]
@@ -142,7 +142,7 @@ then
                     then 
                         echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - dado=$dado" >> $log
                     fi
-                    echo $dado
+                    
                     retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:b2f6e4e9-8fe6-4329-89ae-6878fa0a8227" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d $dado`
                     case $retorno in
                         200)
