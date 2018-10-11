@@ -1,9 +1,9 @@
 #!/bin/bash
-data=`date -v-12H +%s000`
+data=`date -v-5M +%s000`
 query="SELECT * FROM transactions WHERE segments.userData.codigoEstabelecimento IS NOT NULL SINCE $data"
 tabela="teste"
 log="log.txt"
-DEBUG=1
+DEBUG=0
 
 echo "`date +%d-%m-%y_%H:%M:%S` - INFO - INICIO ======= " >> $log
 if [ ${DEBUG} == 1 ]
