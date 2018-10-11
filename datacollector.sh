@@ -1,9 +1,9 @@
 #!/bin/bash
-data=`date -v-5M +%s000`
+data=`date -v-12H +%s000`
 query="SELECT * FROM transactions WHERE segments.userData.codigoEstabelecimento IS NOT NULL SINCE $data"
 tabela="teste"
 log="log.txt"
-DEBUG=0
+DEBUG=1
 
 echo "`date +%d-%m-%y_%H:%M:%S` - INFO - INICIO ======= " >> $log
 if [ ${DEBUG} == 1 ]
@@ -41,7 +41,11 @@ then
         then 
             insert=$insert", " 
         fi 
-    insert=$insert${campos[$i]}":"${tipos[$i]}
+        if [[ ${campos[$i]} = *"valor"* ]]; then 
+            insert=$insert${campos[$i]}":\"float\""
+        else
+            insert=$insert${campos[$i]}":"${tipos[$i]}
+        fi
     done
     
     insert=$insert"} }"
@@ -54,7 +58,6 @@ then
     echo $insert > data.json
 
     HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "@data.json" | jq '.statusCode')
-    # HTTP_CODE=`curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "{ \"schema\" : { $insert } } " | jq '.statusCode'`
     echo $HTTP_CODE
 
     if [ ${DEBUG} == 1 ]
@@ -137,7 +140,11 @@ then
                             then 
                                 dado=$dado"," 
                             fi 
-                            dado=$dado${campos[$z]}":"$valores
+                            if [[ ${campos[$z]} = *"valor"* ]]; then 
+                                dado=$dado${campos[$z]}":"`echo $valores | sed 's/\"//g'`
+                            else
+                                dado=$dado${campos[$z]}":"$valores
+                            fi
                         fi
                     else
                         vazio=1
