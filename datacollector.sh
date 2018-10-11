@@ -141,7 +141,7 @@ then
                                 dado=$dado"," 
                             fi 
                             if [[ ${campos[$z]} = *"valor"* ]]; then 
-                                dado=$dado${campos[$z]}":"`echo $valores | sed 's/\"//g'`
+                                dado=$dado${campos[$z]}":"`echo $valores | sed 's/\"//g' | sed 's/null/0/g'`
                             else
                                 dado=$dado${campos[$z]}":"$valores
                             fi
