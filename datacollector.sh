@@ -3,6 +3,7 @@ data=`date -v-5M +%s000`
 query="SELECT * FROM transactions WHERE segments.userData.codigoEstabelecimento IS NOT NULL SINCE $data"
 tabela="teste"
 log="log.txt"
+proxy=-"--proxy http://proxyservidores:3128"
 DEBUG=0
 
 echo "`date +%d-%m-%y_%H:%M:%S` - INFO - INICIO ======= " >> $log
@@ -11,7 +12,7 @@ then
     echo "`date +%d-%m-%y_%H:%M:%S` - DEBUG - query=$query" >> $log
 fi  
 
-retorno=$(curl -s -o saida.json -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/query" -d "$query" )
+retorno=$(curl -s -o saida.json -w '%{http_code}' $proxy -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/query" -d "$query" )
 
 case $retorno in
     200)
@@ -57,7 +58,7 @@ then
     
     echo $insert > data.json
 
-    HTTP_CODE=$(curl -s -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "@data.json" | jq '.statusCode')
+    HTTP_CODE=$(curl -s $proxy -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/schema/$tabela" -d "@data.json" | jq '.statusCode')
     echo $HTTP_CODE
 
     if [ ${DEBUG} == 1 ]
@@ -159,7 +160,7 @@ then
                     fi
                     
                     echo $dado > dado.json
-                    retorno=`curl -s -o /dev/null -w '%{http_code}' -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d "@dado.json" `
+                    retorno=`curl -s -o /dev/null -w '%{http_code}' $proxy -H"X-Events-API-AccountName:semparar_31ad92ff-4bb1-44f0-a429-314e4808b341" -H"X-Events-API-Key:65a3feb9-3238-4a2f-8c60-758c8d689ed7" -H"Content-type: application/vnd.appd.events+json;v=2" -X POST "https://analytics.api.appdynamics.com/events/publish/$tabela" -d "@dado.json" `
                     case $retorno in
                         200)
                             ;;
