@@ -3,7 +3,7 @@ data=`date -v-5M +%s000`
 query="SELECT * FROM transactions WHERE segments.userData.codigoEstabelecimento IS NOT NULL SINCE $data"
 tabela="teste"
 log="log.txt"
-proxy=-"--proxy http://proxyservidores:3128"
+proxy="--proxy http://proxyservidores:3128"
 DEBUG=0
 
 echo "`date +%d-%m-%y_%H:%M:%S` - INFO - INICIO ======= " >> $log
